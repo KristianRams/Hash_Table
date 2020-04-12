@@ -1,3 +1,4 @@
 # Hash_Table
 Just a simple implementation of a hash table
-Will add resizing later... :) 
+
+I'll add resizing later...  8) 
