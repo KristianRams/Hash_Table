@@ -1,30 +1,18 @@
 #include <stdio.h> 
 #include <stdlib.h> 
 #include <assert.h>
+#include "hash_table.h"
 
-#define R     97      // @Note: Small prime see hash string algoritm
-#define M      5      // @Note: Length of hash table
-#define true   1 
-#define false  0 
-
-typedef struct H_ITEM {
-  int key;
-  int val;
-  struct H_ITEM *next;
-  struct H_ITEM *prev;
-} H_ITEM;
-
-typedef struct H_TABLE {
-  // These variables currently don't have any purpose 
-  // but will when I add resizing later.
-  int count; 
-  int size;
-  H_ITEM **table_arr;
-} H_TABLE;
+#define R      97      // @Note: Small prime see hash string algoritm
+#define SIZE    5      // @Note: Length of hash table
+#define true    1 
+#define false   0 
 
 unsigned insert(H_TABLE *table, int key, int val);
 
 // @Note: Use this not malloc be safe!
+// Get rid of all the unsafe malloc 
+// calls and use this
 void *xmalloc(size_t num_bytes) {
   void *ptr = malloc(num_bytes);
   if (!ptr) {
@@ -77,7 +65,7 @@ unsigned search(H_TABLE *table, int key) {
   // @Cleanup: I don't need to do this 
   // since we are just moving the pointers 
   // Delete this it is unnecessary
-  // Thought of replacing deleted entries with a dirty key
+  // Thought of replacing deleted entries with a sentinel
   // but that's not smart! 
   /* if (current->key == -1) { */
   /*   printf("No item found key %d\n", key); */
@@ -206,13 +194,14 @@ H_TABLE *initialize_hash_table(void) {
   table->count = 0;
   // @Note: This is a hardcoded size
   // make it whatever you want it to be
-  table->size = 5;
+  table->size = M;
   table->table_arr = calloc((size_t)table->size, sizeof(H_ITEM*));
   return table;
 }
 
 void search_test(void) {
   H_TABLE *table = initialize_hash_table();
+  
   H_ITEM *item1 = (H_ITEM*)malloc(sizeof(H_ITEM));
   item1->key = 3;
   item1->val = 30;
@@ -254,22 +243,29 @@ void insert_test(void) {
   H_TABLE *table = initialize_hash_table();
   insert(table, 3, 30);
   search(table, 3);
+
   insert(table, 4, 40);
   search(table, 4);
+  
   insert(table, 3, 60);
   insert(table, 1, 80);
   insert(table, 9, 14);
+  
   search(table, 1);
   search(table, 5);
+  
   insert(table, 4, 5);
+
   search(table, 3);
   search(table, 4);
   search(table, 5);
+
   free(table);
 }
 
 void delete_test(void) {
   H_TABLE *table = initialize_hash_table();
+
   insert(table, 3, 30);
   search(table, 3);
   insert(table, 4, 40);
